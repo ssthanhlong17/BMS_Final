@@ -170,11 +170,19 @@ void handleSerialCommand() {
             Serial.println("\n╔═══ PROTECTION STATUS ═══╗");
             Serial.printf("│ CHG MOSFET: %s\n", digitalRead(PIN_CHG) ? "ON ✅" : "OFF 🔴");
             Serial.printf("│ DSG MOSFET: %s\n", digitalRead(PIN_DSG) ? "ON ✅" : "OFF 🔴");
-            Serial.printf("│ Over Voltage: %s\n", bmsData.overVoltageAlarm ? "ALARM 🔴" : "OK ✅");
-            Serial.printf("│ Under Voltage: %s\n", bmsData.underVoltageAlarm ? "ALARM 🔴" : "OK ✅");
-            Serial.printf("│ Over Current: %s\n", bmsData.overCurrentAlarm ? "ALARM 🔴" : "OK ✅");
-            Serial.printf("│ Over Temp: %s\n", bmsData.overTempAlarm ? "ALARM 🔴" : "OK ✅");
-            Serial.printf("│ Protection: %s\n", protectionTriggered ? "TRIGGERED ⚠️" : "NORMAL ✅");
+            Serial.println("├─────────────────────────┤");
+            Serial.println("│ CHARGING PROTECTION:    │");
+            Serial.printf("│  - Over Voltage: %s\n", bmsData.overVoltageAlarm ? "ALARM 🔴" : "OK ✅");
+            Serial.printf("│  - Over Current: %s\n", bmsData.overCurrentChargeAlarm ? "ALARM 🔴" : "OK ✅");
+            Serial.println("├─────────────────────────┤");
+            Serial.println("│ DISCHARGING PROTECTION: │");
+            Serial.printf("│  - Under Voltage: %s\n", bmsData.underVoltageAlarm ? "ALARM 🔴" : "OK ✅");
+            Serial.printf("│  - Over Current: %s\n", bmsData.overCurrentDischargeAlarm ? "ALARM 🔴" : "OK ✅");
+            Serial.println("├─────────────────────────┤");
+            Serial.println("│ COMMON PROTECTION:      │");
+            Serial.printf("│  - Over Temp: %s\n", bmsData.overTempAlarm ? "ALARM 🔴" : "OK ✅");
+            Serial.println("├─────────────────────────┤");
+            Serial.printf("│ Protection Status: %s\n", protectionTriggered ? "TRIGGERED ⚠️" : "NORMAL ✅");
             Serial.println("╚═════════════════════════╝\n");
         }
         else if (cmd == "clear") {
@@ -372,11 +380,12 @@ void printBMSStatus() {
     Serial.println();
     
     // Alarms
-    if (bmsData.overVoltageAlarm) Serial.println("   🔴 Over Voltage ALARM");
-    if (bmsData.underVoltageAlarm) Serial.println("   🔴 Under Voltage ALARM");
-    if (bmsData.overCurrentAlarm) Serial.println("   🔴 Over Current ALARM");
+    if (bmsData.overVoltageAlarm) Serial.println("   🔴 Over Voltage ALARM (Charging)");
+    if (bmsData.underVoltageAlarm) Serial.println("   🔴 Under Voltage ALARM (Discharging)");
+    if (bmsData.overCurrentChargeAlarm) Serial.println("   🔴 Over Current ALARM (Charging)");
+    if (bmsData.overCurrentDischargeAlarm) Serial.println("   🔴 Over Current ALARM (Discharging)");
     if (bmsData.overTempAlarm) Serial.println("   🔴 Over Temperature ALARM");
-    
+        
     // SOH Warning
     if (soh.getSOH() < 90.0f) {
         Serial.printf("   ⚠️  SOH degraded: %.0f%%\n", soh.getSOH());

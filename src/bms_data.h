@@ -8,10 +8,11 @@
 const int NUM_CELLS = 4;
 
 // Ngưỡng bảo vệ (điều chỉnh cho LiFePO4)
-#define CELL_OV_THRESHOLD 3.65   // Over voltage (LiFePO4)
-#define CELL_UV_THRESHOLD 2.50   // Under voltage (LiFePO4)
-#define PACK_OC_THRESHOLD 5.0    // Over current (A)
-#define PACK_OT_THRESHOLD 50.0   // Over temperature (°C)
+#define CELL_OV_THRESHOLD 3.65      // Over voltage sạc
+#define CELL_UV_THRESHOLD 2.50      // Under voltage xả
+#define PACK_OC_CHARGE_THRESHOLD 5.0   // Over current sạc (A)
+#define PACK_OC_DISCHARGE_THRESHOLD 10.0 // Over current xả (A)
+#define PACK_OT_THRESHOLD 50.0      // Over temperature (°C)
 #define CELL_BALANCE_DIFF 0.05   // 50mV difference to trigger balancing
 
 // Tham số tính toán SOC
@@ -28,11 +29,11 @@ struct BMSData {
     float avgCellVoltage;
     
     // Protection status
-    bool overVoltageAlarm;
-    bool underVoltageAlarm;
-    bool overCurrentAlarm;
+    bool overVoltageAlarm;        // Khi sạc
+    bool underVoltageAlarm;       // Khi xả
+    bool overCurrentChargeAlarm;  // Khi sạc
+    bool overCurrentDischargeAlarm; // Khi xả
     bool overTempAlarm;
-    bool shortCircuitAlarm;
     
     // Balancing
     bool balancingActive;
@@ -101,27 +102,42 @@ void checkBalancing() {
 
 // Kiểm tra protection
 void checkProtection() {
-    // Over/Under Voltage
+    // Over Voltage - chỉ khi đang sạc
     bmsData.overVoltageAlarm = false;
-    bmsData.underVoltageAlarm = false;
-    
-    for (int i = 0; i < NUM_CELLS; i++) {
-        if (bmsData.cellVoltages[i] > CELL_OV_THRESHOLD) {
-            bmsData.overVoltageAlarm = true;
-        }
-        if (bmsData.cellVoltages[i] < CELL_UV_THRESHOLD) {
-            bmsData.underVoltageAlarm = true;
+    if (bmsData.isCharging) {
+        for (int i = 0; i < NUM_CELLS; i++) {
+            if (bmsData.cellVoltages[i] > CELL_OV_THRESHOLD) {
+                bmsData.overVoltageAlarm = true;
+                break;
+            }
         }
     }
     
-    // Over Current
-    bmsData.overCurrentAlarm = (abs(bmsData.current) > PACK_OC_THRESHOLD);
+    // Under Voltage - chỉ khi đang xả
+    bmsData.underVoltageAlarm = false;
+    if (bmsData.isDischarging) {
+        for (int i = 0; i < NUM_CELLS; i++) {
+            if (bmsData.cellVoltages[i] < CELL_UV_THRESHOLD) {
+                bmsData.underVoltageAlarm = true;
+                break;
+            }
+        }
+    }
     
-    // Over Temperature
+    // Over Current - tách riêng sạc và xả
+    bmsData.overCurrentChargeAlarm = false;
+    bmsData.overCurrentDischargeAlarm = false;
+    
+    if (bmsData.isCharging && bmsData.current > PACK_OC_CHARGE_THRESHOLD) {
+        bmsData.overCurrentChargeAlarm = true;
+    }
+    
+    if (bmsData.isDischarging && abs(bmsData.current) > PACK_OC_DISCHARGE_THRESHOLD) {
+        bmsData.overCurrentDischargeAlarm = true;
+    }
+    
+    // Over Temperature - cả sạc và xả
     bmsData.overTempAlarm = (bmsData.packTemp > PACK_OT_THRESHOLD);
-    
-    // Short Circuit (dòng cực lớn)
-    bmsData.shortCircuitAlarm = (abs(bmsData.current) > 10.0);
 }
 
 // Cập nhật charging status
@@ -237,9 +253,9 @@ String getBMSJson() {
     JsonObject protection = doc.createNestedObject("protection");
     protection["overVoltage"] = statusToString(bmsData.overVoltageAlarm);
     protection["underVoltage"] = statusToString(bmsData.underVoltageAlarm);
-    protection["overCurrent"] = statusToString(bmsData.overCurrentAlarm);
+    protection["overCurrentCharge"] = statusToString(bmsData.overCurrentChargeAlarm);
+    protection["overCurrentDischarge"] = statusToString(bmsData.overCurrentDischargeAlarm);
     protection["overTemperature"] = statusToString(bmsData.overTempAlarm);
-    protection["shortCircuit"] = statusToString(bmsData.shortCircuitAlarm);
     
     // ============ ALERTS ============
     JsonArray alerts = doc.createNestedArray("alerts");
@@ -247,33 +263,32 @@ String getBMSJson() {
     if (bmsData.overVoltageAlarm) {
         JsonObject alert = alerts.createNestedObject();
         alert["severity"] = "critical";
-        alert["message"] = "⚠️ Điện áp quá cao!";
+        alert["message"] = "Ngắt sạc: Điện áp quá cao!";
     }
 
     if (bmsData.underVoltageAlarm) {
         JsonObject alert = alerts.createNestedObject();
         alert["severity"] = "critical";
-        alert["message"] = "⚠️ Điện áp quá thấp!";
+        alert["message"] = "Ngắt xả: Điện áp quá thấp!";
     }
 
-    if (bmsData.overCurrentAlarm) {
+    if (bmsData.overCurrentChargeAlarm) {
         JsonObject alert = alerts.createNestedObject();
         alert["severity"] = "critical";
-        alert["message"] = "⚠️ Dòng điện quá tải!";
+        alert["message"] = "Ngắt sạc: Dòng điện quá tải!";
+    }
+
+    if (bmsData.overCurrentDischargeAlarm) {
+        JsonObject alert = alerts.createNestedObject();
+        alert["severity"] = "critical";
+        alert["message"] = "Ngắt xả: Dòng điện quá tải!";
     }
 
     if (bmsData.overTempAlarm) {
         JsonObject alert = alerts.createNestedObject();
         alert["severity"] = "critical";
-        alert["message"] = "⚠️ Nhiệt độ quá cao!";
+        alert["message"] = "Ngắt: Nhiệt độ quá cao!";
     }
-
-    if (bmsData.shortCircuitAlarm) {
-        JsonObject alert = alerts.createNestedObject();
-        alert["severity"] = "critical";
-        alert["message"] = "⚠️ Ngắn mạch!";
-    }
-
     if (bmsData.balancingActive) {
         float maxV = bmsData.cellVoltages[0];
         float minV = bmsData.cellVoltages[0];
@@ -284,7 +299,7 @@ String getBMSJson() {
         if ((maxV - minV) > 0.05) {
             JsonObject alert = alerts.createNestedObject();
             alert["severity"] = "warning";
-            alert["message"] = "⚠️ Chênh lệch điện áp giữa các cell quá lớn";
+            alert["message"] = "Chênh lệch điện áp giữa các cell quá lớn";
         }
     }
 
@@ -293,14 +308,14 @@ String getBMSJson() {
         JsonObject alert = alerts.createNestedObject();
         alert["severity"] = "warning";
         char msg[64];
-        sprintf(msg, "⚠️ SOH giảm: %.1f%%", bmsData.soh);
+        sprintf(msg, "SOH giảm: %.1f%%", bmsData.soh);
         alert["message"] = msg;
     }
 
     if (bmsData.soh < 80.0) {
         JsonObject alert = alerts.createNestedObject();
         alert["severity"] = "critical";
-        alert["message"] = "🚨 Pin gần hết tuổi thọ (SOH < 80%)";
+        alert["message"] = "Pin hết tuổi thọ (SOH < 80%)";
     }
 
     
@@ -326,9 +341,9 @@ void initBMSData() {
     
     bmsData.overVoltageAlarm = false;
     bmsData.underVoltageAlarm = false;
-    bmsData.overCurrentAlarm = false;
+    bmsData.overCurrentChargeAlarm = false;
+    bmsData.overCurrentDischargeAlarm = false;
     bmsData.overTempAlarm = false;
-    bmsData.shortCircuitAlarm = false;
     bmsData.balancingActive = false;
     bmsData.isCharging = false;
     bmsData.isDischarging = false;

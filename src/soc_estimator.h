@@ -26,9 +26,9 @@ private:
     const float V_CHARGING = 14.6f;       // Pack đang sạc max: 3.65V/cell × 4
     const float V_EMPTY = 9.0f;           // Pack cạn: 2.25V/cell × 4
     const float V_CUTOFF = 10.0f;         // Cut-off bảo vệ: 2.5V/cell × 4
-    const float V_RECALIB_FULL = 14.0f;   // Ngưỡng bắt đầu kiểm tra đầy
-    const float V_RECALIB_EMPTY = 10.4f;  // Ngưỡng bắt đầu kiểm tra cạn
-    const float I_IDLE_THRESHOLD = 0.3f;  // Dòng idle (A)
+    const float V_RECALIB_FULL = 14.4f;   // Ngưỡng bắt đầu kiểm tra đầy
+    const float V_RECALIB_EMPTY = 10.0f;  // Ngưỡng bắt đầu kiểm tra cạn
+    const float I_IDLE_THRESHOLD = 0.05f;  // Dòng idle (A)
     
     // ==================== BẢNG OCV CHO LiFePO4 4S ====================
     // [SOC%, Voltage_Pack] - Lấy giá trị giữa của mỗi khoảng × 4 cells
@@ -135,14 +135,15 @@ private:
         
         unsigned long idleDuration = isIdle ? (millis() - idleStartTime) : 0;
         
-        // ===== HIỆU CHỈNH KHI ĐẦY =====
-        // Điều kiện: V > 14.0V, dòng nhỏ, idle > 30s
-        if (voltage >= V_RECALIB_FULL && 
-            abs(current) < I_IDLE_THRESHOLD && 
-            idleDuration > 30000) {
-            
-            if (voltage >= V_FULL) {
-                // Pin đã đầy hoàn toàn
+        // =========================
+        //  HIỆU CHỈNH KHI PIN ĐẦY
+        // =========================
+        // Điều kiện: V ≥ 14.4V, |I| < 0.1A, idle ≥ 60s
+        if (voltage >= V_RECALIB_FULL &&
+            abs(current) < I_IDLE_THRESHOLD &&
+            idleDuration >= 60000) {
+
+            if (voltage >= V_FULL) {   // V_FULL = 14.4V
                 if (abs(soc - 100.0f) > 2.0f) {
                     Serial.println("🔄 Recal: FULL");
                 }
@@ -150,21 +151,26 @@ private:
                 coulombCounter_mAh = CAPACITY_MAH;
             }
         }
-        
-        // ===== HIỆU CHỈNH KHI CẠN =====
-        // Điều kiện: V < 10.4V
+
+
+
+        // =========================
+        //  HIỆU CHỈNH KHI PIN CẠN
+        // =========================
+        // Điều kiện: V ≤ 10.0V
         if (voltage <= V_RECALIB_EMPTY) {
-            if (voltage <= V_CUTOFF) {
-                // Pin gần cạn (cut-off bảo vệ)
+
+            // ----- MỨC 1: Soft-cutoff (≈2.1V/cell → 8.4V pack) -----
+            if (voltage <= V_CUTOFF && voltage > V_EMPTY) { 
                 if (abs(soc - 5.0f) > 2.0f) {
                     Serial.println("🔄 Recal: LOW");
                 }
                 soc = 5.0f;
                 coulombCounter_mAh = CAPACITY_MAH * 0.05f;
             }
-            
-            if (voltage <= V_EMPTY) {
-                // Pin đã cạn hoàn toàn
+
+            // ----- MỨC 2: Hard cutoff (2.0V/cell → 8.0V pack) -----
+            if (voltage <= V_EMPTY) {  
                 if (abs(soc - 0.0f) > 1.0f) {
                     Serial.println("🔄 Recal: EMPTY");
                 }
@@ -172,6 +178,7 @@ private:
                 coulombCounter_mAh = 0.0f;
             }
         }
+
         
         // ===== HIỆU CHỈNH ĐỊNH KỲ TỪ OCV =====
         // Khi idle > 2 giờ, đồng bộ lại với OCV

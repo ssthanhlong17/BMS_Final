@@ -91,15 +91,33 @@ function updateChargingStatus(status) {
 
 function updateProtectionStatus(protectionData) {
     const protections = {
-        'protectOV': { data: protectionData.overVoltage, label: 'Over Voltage' },
-        'protectUV': { data: protectionData.underVoltage, label: 'Under Voltage' },
-        'protectOC': { data: protectionData.overCurrent, label: 'Over Current' },
-        'protectSC': { data: protectionData.shortCircuit, label: 'Short Circuit' },
-        'protectOT': { data: protectionData.overTemperature, label: 'Over Temperature' }
+        'protectOV': { 
+            data: protectionData.overVoltage, 
+            label: 'Over Voltage (Sạc)' 
+        },
+        'protectUV': { 
+            data: protectionData.underVoltage, 
+            label: 'Under Voltage (Xả)' 
+        },
+        'protectOCCharge': { 
+            data: protectionData.overCurrentCharge, 
+            label: 'Over Current (Sạc)' 
+        },
+        'protectOCDischarge': { 
+            data: protectionData.overCurrentDischarge, 
+            label: 'Over Current (Xả)' 
+        },
+        'protectOT': { 
+            data: protectionData.overTemperature, 
+            label: 'Over Temperature' 
+        }
+        // XÓA protectSC
     };
 
     for (const [id, info] of Object.entries(protections)) {
         const element = document.getElementById(id);
+        if (!element) continue;
+        
         const statusEl = element.querySelector('.protection-status');
         
         element.classList.remove('alert', 'alarm');

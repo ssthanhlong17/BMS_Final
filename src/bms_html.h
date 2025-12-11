@@ -140,7 +140,7 @@ String getHTMLPage() {
                         </div>
                     </div>
 
-                    <div class="protection-item" id="protectOC">
+                    <div class="protection-item" id="protectOCCharge">
                         <div class="protection-icon">⚠️</div>
                         <div class="protection-info">
                             <div class="protection-label">Over Current</div>
@@ -148,10 +148,10 @@ String getHTMLPage() {
                         </div>
                     </div>
 
-                    <div class="protection-item" id="protectSC">
+                    <div class="protection-item" id="protectOCDischarge">
                         <div class="protection-icon">⚠️</div>
                         <div class="protection-info">
-                            <div class="protection-label">Short Circuit</div>
+                            <div class="protection-label">Over Current</div>
                             <div class="protection-status">Normal</div>
                         </div>
                     </div>
@@ -162,7 +162,7 @@ String getHTMLPage() {
                             <div class="protection-label">Over Temperature</div>
                             <div class="protection-status">Normal</div>
                         </div>
-                    </div>
+                    </div>           
                 </div>
             </div>
 
