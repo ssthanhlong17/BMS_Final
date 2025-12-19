@@ -26,24 +26,25 @@ private:
     const float V_CHARGING = 14.6f;       // Pack đang sạc max: 3.65V/cell × 4
     const float V_EMPTY = 9.0f;           // Pack cạn: 2.25V/cell × 4
     const float V_CUTOFF = 10.0f;         // Cut-off bảo vệ: 2.5V/cell × 4
-    const float V_RECALIB_FULL = 14.4f;   // Ngưỡng bắt đầu kiểm tra đầy
+    const float V_RECALIB_FULL = 14.6f;   // Ngưỡng bắt đầu kiểm tra đầy
     const float V_RECALIB_EMPTY = 10.0f;  // Ngưỡng bắt đầu kiểm tra cạn
     const float I_IDLE_THRESHOLD = 0.05f;  // Dòng idle (A)
+    const float ALPHA = 0.85f;   // Hệ số tin Coulomb (có thể tinh chỉnh)
     
     // ==================== BẢNG OCV CHO LiFePO4 4S ====================
     // [SOC%, Voltage_Pack] - Lấy giá trị giữa của mỗi khoảng × 4 cells
     const float OCV_TABLE[11][2] = {
-        {0,   9.00},    // 2.25V/cell (giữa 2.0-2.5)
-        {10,  11.80},   // 2.95V/cell (giữa 2.9-3.0)
-        {20,  12.60},   // 3.15V/cell (giữa 3.1-3.2)
-        {30,  12.90},   // 3.225V/cell (giữa 3.2-3.25)
-        {40,  13.10},   // 3.275V/cell (giữa 3.25-3.3)
-        {50,  13.30},   // 3.325V/cell (giữa 3.3-3.35)
-        {60,  13.50},   // 3.375V/cell (giữa 3.35-3.4)
-        {70,  13.70},   // 3.425V/cell (giữa 3.4-3.45)
-        {80,  13.90},   // 3.475V/cell (giữa 3.45-3.5)
-        {90,  14.10},   // 3.525V/cell (giữa 3.5-3.55)
-        {100, 14.50}    // 3.625V/cell (giữa 3.6-3.65)
+        {0,   10.0},   // 0%  - pin cạn sâu
+        {10,  12.0},   // 10%
+        {20,  12.5},   // 20%
+        {30,  12.8},   // 30%
+        {40,  12.9},   // 40%
+        {50,  13.0},   // 50%
+        {60,  13.1},   // 60%
+        {70,  13.2},   // 70%
+        {80,  13.3},   // 80%
+        {90,  13.4},   // 90%
+        {100, 13.6}    // 100% Rest
     };
     
     // ==================== BẢNG BÙ NHIỆT ĐỘ ====================
@@ -66,6 +67,7 @@ private:
     // Biến phụ cho recalibration
     unsigned long idleStartTime;    // Thời điểm bắt đầu idle
     bool isIdle;                    // Đang ở trạng thái idle
+    bool chargedFullThisCycle;      // = true khi đã kết thúc sạc đầy trong chu kỳ gần nhất
     
     // ==================== HÀM NỘI BỘ ====================
     
@@ -135,62 +137,45 @@ private:
         
         unsigned long idleDuration = isIdle ? (millis() - idleStartTime) : 0;
         
+        // ===== Đánh dấu pin đã từng sạc đầy trong chu kỳ hiện tại =====
+        if (voltage >= 14.5 && current > 0) {
+            chargedFullThisCycle = true;
+        }
+        if (voltage <= 13.2) {   // ~3.3V/cell - reset cờ khi xả sâu
+            chargedFullThisCycle = false;
+        }
+
         // =========================
         //  HIỆU CHỈNH KHI PIN ĐẦY
         // =========================
-        // Điều kiện: V ≥ 14.4V, |I| < 0.1A, idle ≥ 60s
+        // Điều kiện: V ≥ 14.6V, idle ≥ 30 phút, đã từng sạc đầy
         if (voltage >= V_RECALIB_FULL &&
             abs(current) < I_IDLE_THRESHOLD &&
-            idleDuration >= 60000) {
-
-            if (voltage >= V_FULL) {   // V_FULL = 14.4V
-                if (abs(soc - 100.0f) > 2.0f) {
-                    Serial.println("🔄 Recal: FULL");
-                }
-                soc = 100.0f;
-                coulombCounter_mAh = CAPACITY_MAH;
+            idleDuration >= 1800000 &&  // 30 phút
+            chargedFullThisCycle) {
+            
+            if (abs(soc - 100.0f) > 2.0f) {
+                Serial.println("🔄 Recal: FULL");
             }
+            soc = 100.0f;
+            coulombCounter_mAh = CAPACITY_MAH;
         }
-
-
-
-        // =========================
-        //  HIỆU CHỈNH KHI PIN CẠN
-        // =========================
-        // Điều kiện: V ≤ 10.0V
-        if (voltage <= V_RECALIB_EMPTY) {
-
-            // ----- MỨC 1: Soft-cutoff (≈2.1V/cell → 8.4V pack) -----
-            if (voltage <= V_CUTOFF && voltage > V_EMPTY) { 
-                if (abs(soc - 5.0f) > 2.0f) {
-                    Serial.println("🔄 Recal: LOW");
-                }
-                soc = 5.0f;
-                coulombCounter_mAh = CAPACITY_MAH * 0.05f;
-            }
-
-            // ----- MỨC 2: Hard cutoff (2.0V/cell → 8.0V pack) -----
-            if (voltage <= V_EMPTY) {  
-                if (abs(soc - 0.0f) > 1.0f) {
-                    Serial.println("🔄 Recal: EMPTY");
-                }
-                soc = 0.0f;
-                coulombCounter_mAh = 0.0f;
-            }
-        }
-
-        
+  
         // ===== HIỆU CHỈNH ĐỊNH KỲ TỪ OCV =====
         // Khi idle > 2 giờ, đồng bộ lại với OCV
-        if (idleDuration > 7200000) {  // 2 giờ = 7200000ms
+        if (isIdle && idleDuration > 7200000) {  // 2 giờ
             float ocvSOC = ocvToSOC(voltage);
             float socError = abs(ocvSOC - soc);
             
-            if (socError > 5.0f) {  // Sai lệch > 5%
-                Serial.printf("🔄 OCV Sync: %.1f%% → %.1f%%\n", soc, ocvSOC);
-                
-                soc = ocvSOC;
+            if (socError > 5.0f) {
+                float socNew = soc * ALPHA + ocvSOC * (1.0f - ALPHA);
+                Serial.printf(
+                    "🔄 OCV Sync (soft): SOC=%.1f%% | OCV=%.1f%% → %.1f%%\n",
+                    soc, ocvSOC, socNew
+                );
+                soc = socNew;
                 coulombCounter_mAh = (soc / 100.0f) * CAPACITY_MAH;
+                idleStartTime = millis();  // Reset để tránh sync lại ngay
             }
         }
     }
@@ -205,7 +190,8 @@ public:
           lastUpdateTime(0),
           initialized(false),
           idleStartTime(0),
-          isIdle(false)
+          isIdle(false),
+          chargedFullThisCycle(false)
     {
     }
     
@@ -222,7 +208,7 @@ public:
                       packVoltage, soc, CAPACITY_AH);
     }
     
-    
+    // ==================== CẬP NHẬT SOC (COULOMB COUNTING) ====================
     void update(float current_A, float temperature) {
         if (!initialized) {
             Serial.println("⚠️ SOC not initialized! Call initializeFromVoltage() first");
@@ -257,7 +243,6 @@ public:
             coulombCounter_mAh = 0.0f;  // Chỉ reset khi thực sự cạn
         }
     }
-
     
     // ==================== AUTO RECALIBRATION ====================
     void recalibrate(float packVoltage, float current_A) {
@@ -296,5 +281,3 @@ public:
 };
 
 #endif // SOC_ESTIMATOR_H
-
-
