@@ -27,11 +27,6 @@ private:
     const float EOL_CAPACITY_PERCENT;     // 80% (End of Life)
     const float RATED_CYCLES;             // 2000 cycles @ 80% SOH
     
-    // ==================== NGƯỠNG PHÁ́T HIỆN CHU KỲ ====================
-    const float CYCLE_SOC_MIN = 20.0f;    // SOC tối thiểu để tính cycle
-    const float CYCLE_SOC_MAX = 80.0f;    // SOC tối đa để tính cycle
-    const float CYCLE_DEPTH_MIN = 30.0f;  // Độ sâu xả tối thiểu (%)
-    
     // ==================== HỆ SỐ TÍNH TOÁN ====================
     const float CYCLE_AGING_LINEAR = 0.01f;  // Mất 0.01% SOH mỗi cycle
                                               // 2000 cycles × 0.01% = 20% loss
@@ -72,7 +67,7 @@ private:
     }
     
     /**
-     * Phát hiện chu kỳ sạc/xả và cập nhật
+     * Phát hiện chu kỳ sạc/xả và cập nhật (đơn giản hóa)
      */
     void detectCycle(float currentSOC) {
         float deltaSOC = currentSOC - lastSOC;
@@ -271,6 +266,3 @@ public:
 };
 
 #endif // SOH_ESTIMATOR_H
-
-
-
