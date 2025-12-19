@@ -179,9 +179,6 @@ void handleSerialCommand() {
             Serial.printf("│  - Under Voltage: %s\n", bmsData.underVoltageAlarm ? "ALARM 🔴" : "OK ✅");
             Serial.printf("│  - Over Current: %s\n", bmsData.overCurrentDischargeAlarm ? "ALARM 🔴" : "OK ✅");
             Serial.println("├─────────────────────────┤");
-            Serial.println("│ COMMON PROTECTION:      │");
-            Serial.printf("│  - Over Temp: %s\n", bmsData.overTempAlarm ? "ALARM 🔴" : "OK ✅");
-            Serial.println("├─────────────────────────┤");
             Serial.printf("│ Protection Status: %s\n", protectionTriggered ? "TRIGGERED ⚠️" : "NORMAL ✅");
             Serial.println("╚═════════════════════════╝\n");
         }
@@ -384,7 +381,6 @@ void printBMSStatus() {
     if (bmsData.underVoltageAlarm) Serial.println("   🔴 Under Voltage ALARM (Discharging)");
     if (bmsData.overCurrentChargeAlarm) Serial.println("   🔴 Over Current ALARM (Charging)");
     if (bmsData.overCurrentDischargeAlarm) Serial.println("   🔴 Over Current ALARM (Discharging)");
-    if (bmsData.overTempAlarm) Serial.println("   🔴 Over Temperature ALARM");
         
     // SOH Warning
     if (soh.getSOH() < 90.0f) {
@@ -490,5 +486,11 @@ void loop() {
     
     delay(10);  // Small delay for stability
 }
+
+
+
+
+  
+
 
 
