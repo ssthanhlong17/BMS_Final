@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "../../../bms_frondend"
+		},
+		{
+			"name": "BMS_Final",
+			"path": "."
+		},
+		{
+			"name": "tokook",
+			"path": "../tokook"
+		},
+		{
+			"name": "V1_TESTVID",
+			"path": "../../../../Downloads/V1_TESTVID"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "bms_frondend"
+	}
+}
