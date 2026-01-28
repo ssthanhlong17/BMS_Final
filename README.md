@@ -22,7 +22,7 @@ Hệ thống BMS hoàn chỉnh cho pin LiFePO4 4S (14.4V nominal) với các tí
 
 ## 🔧 Phần cứng
 
-### Thông số pin
+### Thông số pin dựa datasheet LiFePO4 EVH-32700
 - **Loại cell**: LiFePO4 EVH-32700
 - **Cấu hình**: 4S (4 cell nối tiếp)
 - **Dung lượng**: 6000mAh (6Ah)
@@ -72,27 +72,31 @@ Baud: 115200
 ```
 ESP32_BMS/
 ├── src/
-│   ├── main.cpp              # Main program
-│   ├── BMSBalancing.cpp      # Cell balancing logic
-│   ├── BMSData.cpp           # Data management
-│   ├── BMSDwin.cpp           # DWIN display driver
-│   ├── BMSProtection.cpp     # Protection system
-│   ├── BMSSensors.cpp        # Sensor readings
-│   ├── BMSHTML.cpp           # Web interface
-│   ├── SOCEstimator.cpp      # State of Charge
-│   └── SOHEstimator.cpp      # State of Health
+│   ├── main.cpp                  # Main program (tích hợp cả 2)
+│   │
+│   ├── [QUANG] Hardware & Sensors
+│   ├── BMSSensors.cpp            # Đo điện áp, dòng, nhiệt độ
+│   ├── BMSProtection.cpp         # Bảo vệ OV/UV/OC/OT
+│   ├── BMSBalancing.cpp          # Cân bằng cell thụ động
+│   ├── BMSDwin.cpp               # Driver màn hình DWIN
+│   │
+│   ├── [LONG] Algorithms & Monitoring
+│   ├── SOCEstimator.cpp          # Thuật toán SOC
+│   ├── SOHEstimator.cpp          # Thuật toán SOH
+│   ├── BMSData.cpp               # Cấu trúc dữ liệu & JSON
+│   └── BMSHTML.cpp               # Web Dashboard & WiFi AP
 │
 ├── include/
-│   ├── BMSBalancing.h
-│   ├── BMSData.h
-│   ├── BMSDwin.h
-│   ├── BMSProtection.h
 │   ├── BMSSensors.h
-│   ├── BMSHTML.h
+│   ├── BMSProtection.h
+│   ├── BMSBalancing.h
+│   ├── BMSDwin.h
 │   ├── SOCEstimator.h
-│   └── SOHEstimator.h
+│   ├── SOHEstimator.h
+│   ├── BMSData.h
+│   └── BMSHTML.h
 │
-├── platformio.ini            # PlatformIO config
+├── platformio.ini
 └── README.md
 ```
 
@@ -177,9 +181,9 @@ help            - Hiển thị menu lệnh
 
 ### SOC Estimation
 **Hybrid Method**:
-1. **OCV Lookup**: Khởi tạo SOC từ điện áp pack
+1. **OCV Lookup**: Khởi tạo SOC từ điện áp pack tham khảo link https://www.ecoflow.com/us/blog/lifepo4-voltage-chart
 2. **Coulomb Counting**: Tích hợp dòng điện theo thời gian
-3. **Temperature Compensation**: Bù nhiệt độ cho dung lượng
+3. **Temperature Compensation**: Bù nhiệt độ cho dung lượng dựa trên datasheet LiFePO4 EVH-32700
 4. **Auto Recalibration**:
    - Full charge: V ≥ 14.6V, idle ≥ 30min
    - OCV sync: idle ≥ 2 hours
@@ -190,7 +194,7 @@ help            - Hiển thị menu lệnh
 SOH = 100% - (total_cycles × 0.01%)
 ```
 - Mỗi chu kỳ sạc/xả: -0.01% SOH
-- 2000 cycles → 80% SOH (End of Life)
+- 2000 cycles → 80% SOH (End of Life) dựa trên datasheet LiFePO4 EVH-32700
 - Lưu dữ liệu vào NVS flash mỗi 5 phút
 
 ### Cell Balancing
@@ -199,7 +203,7 @@ SOH = 100% - (total_cycles × 0.01%)
 - Tắt khi: Delta < 30mV hoặc có dòng
 - Chu kỳ: 5s ON / 5s OFF (tránh quá nhiệt)
 
-### Protection
+### Protection dựa trên datasheet
 **Hysteresis với Recovery Timer**:
 - **Charge**: OV (3.65V), OC (1.4A), OT (45°C)
 - **Discharge**: UV (2.5V), OC (-6A), OT (60°C)
@@ -254,7 +258,7 @@ SOH = 100% - (total_cycles × 0.01%)
 
 ---
 
-## 🛡️ Ngưỡng bảo vệ
+## 🛡️ Ngưỡng bảo vệ dựa trên datasheet LiFePO4 EVH-32700
 
 ### Charging Protection
 | Parameter | Warning | Trip | Release | Recovery Time |
