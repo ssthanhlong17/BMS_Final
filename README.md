@@ -87,11 +87,14 @@ ESP32_BMS/
 │   └── BMSHTML.cpp               # Web Dashboard & WiFi AP
 │
 ├── include/
-│   ├── BMSSensors.h
-│   ├── BMSProtection.h
-│   ├── BMSBalancing.h
-│   ├── BMSDwin.h
-│   ├── SOCEstimator.h
+│   ├── bmsensors.h
+│   ├── bmsprotection.h
+│   ├── bmsalancing.h
+│   ├── bmsdwin.h
+│   ├── bms_html.h
+│   ├── bms_html_styles.h [LONG]
+│   ├── bms_html_scripts.h [LONG]
+│   ├── SOCEstimator.h [LONG]
 │   ├── SOHEstimator.h
 │   ├── BMSData.h
 │   └── BMSHTML.h
