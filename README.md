@@ -39,19 +39,19 @@ PIN_T3 = 32  // Tap point 3 (Cell 3-4)
 PIN_T4 = 33  // Tap point 4 (Cell 4)
 ```
 
-#### Đo dòng & nhiệt độ
+#### Đo dòng sử dụng ACS712-20A & nhiệt độ sử dụng LM35
 ```
 PIN_I    = 36  // ACS712-20A Current Sensor
 PIN_TEMP = 39  // LM35 Temperature Sensor
 ```
 
-#### Bảo vệ (MOSFETs)
+#### Bảo vệ sử dụng MOSFETs
 ```
 PIN_CHG = 22  // Charge MOSFET Control
 PIN_DSG = 23  // Discharge MOSFET Control
 ```
 
-#### Cân bằng
+#### Cân bằng xả thụ động sử dụng: opto cách ly PC817C, MOSFET N–channel SI2302 và điện trở xả 47Ω.
 ```
 PIN_BAL1 = 25  // Balancing Cell 1
 PIN_BAL2 = 26  // Balancing Cell 2
@@ -59,7 +59,7 @@ PIN_BAL3 = 27  // Balancing Cell 3
 PIN_BAL4 = 14  // Balancing Cell 4
 ```
 
-#### DWIN Display (UART)
+#### DWIN Display sử dụng DWIN DMG80480T043- 01WTC
 ```
 Serial2: TX=17, RX=16
 Baud: 115200
