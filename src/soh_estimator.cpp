@@ -53,7 +53,7 @@ void SOHEstimator::detectCycle(float currentSOC) {
         totalCycles += newCycles;
         cycleDepthAccum = 0.0f;
         
-        Serial.printf("🔄 +%.2f cycles | Total: %.1f\n", newCycles, totalCycles);
+        Serial.printf("+%.2f cycles | Total: %.1f\n", newCycles, totalCycles);
     }
     
     lastSOC = currentSOC;
@@ -76,7 +76,7 @@ void SOHEstimator::loadFromFlash() {
     currentCapacity_Ah = prefs.getFloat("capacity", NOMINAL_CAPACITY_AH);
     prefs.end();
     
-    Serial.printf("📂 SOH loaded: %.1f%% | %.1f cycles\n", soh, totalCycles);
+    Serial.printf("SOH loaded: %.1f%% | %.1f cycles\n", soh, totalCycles);
 }
 
 void SOHEstimator::update(float currentSOC, float temperature) {
@@ -102,7 +102,7 @@ void SOHEstimator::resetCycles() {
     equivalentFullCycles = 0.0f;
     cycleDepthAccum = 0.0f;
     saveToFlash();
-    Serial.println("🔄 Cycles reset");
+    Serial.println("Cycles reset");
 }
 
 void SOHEstimator::resetSOH() {
@@ -111,7 +111,7 @@ void SOHEstimator::resetSOH() {
     equivalentFullCycles = 0.0f;
     currentCapacity_Ah = NOMINAL_CAPACITY_AH;
     saveToFlash();
-    Serial.println("🔄 SOH reset to 100%");
+    Serial.println("SOH reset to 100%");
 }
 
 void SOHEstimator::calibrateFromCapacity(float measured_capacity_Ah) {
@@ -122,7 +122,7 @@ void SOHEstimator::calibrateFromCapacity(float measured_capacity_Ah) {
     totalCycles = estimatedCycles;
     
     saveToFlash();
-    Serial.printf("🔧 SOH calibrated: %.1f%% (%.2fAh)\n", soh, currentCapacity_Ah);
+    Serial.printf("SOH calibrated: %.1f%% (%.2fAh)\n", soh, currentCapacity_Ah);
 }
 
 float SOHEstimator::getSOH() const { 
