@@ -201,13 +201,13 @@ bool BMSSensors::isIdle() const {
 
 void BMSSensors::printDebug() {
     Serial.println("\n╔═══ SENSORS DEBUG ═══╗");
-    Serial.printf("📦 Pack: %.3fV\n", packVoltage);
-    Serial.println("📊 Cells:");
+    Serial.printf("Pack: %.3fV\n", packVoltage);
+    Serial.println("Cells:");
     for (int i = 0; i < 4; i++) {
         Serial.printf("   Cell %d: %.3fV\n", i+1, cellVoltages[i]);
     }
-    Serial.printf("⚡ Current: %+.3fA\n", current);
-    Serial.printf("🌡  Temp: %.1f°C\n", temperature);
-    Serial.printf("⏱  Last read: %lums ago\n", millis() - lastReadTime);
+    Serial.printf("Current: %+.3fA\n", current);
+    Serial.printf("Temp: %.1f°C\n", temperature);
+    Serial.printf("Last read: %lums ago\n", millis() - lastReadTime);
     Serial.println("╚═════════════════════╝\n");
 }
