@@ -78,11 +78,9 @@ function updateChargingStatus(status) {
         text.textContent = 'Charging';
     } else if (status === 'discharging') {
         badge.classList.add('discharging');
-        icon.textContent = '⚡';
         text.textContent = 'Discharging';
     } else {
         badge.classList.add('idle');
-        icon.textContent = '⏸️';
         text.textContent = 'Idle';
     }
 }
@@ -183,7 +181,6 @@ function updateAlerts(alerts) {
     container.classList.remove('hidden');
     container.innerHTML = alerts.map(alert => `
         <div class="alert ${alert.severity}">
-            <div class="alert-icon">${alert.severity === 'critical' ? '🚨' : '⚠️'}</div>
             <div class="alert-text">${alert.message}</div>
         </div>
     `).join('');
@@ -256,18 +253,18 @@ async function fetchBMSData() {
             }
         }
         
-        console.log('✅ Data updated:', new Date().toLocaleTimeString());
+        console.log('Data updated:', new Date().toLocaleTimeString());
         
     } catch (error) {
-        console.error('❌ Fetch error:', error);
+        console.error('Fetch error:', error);
         document.getElementById('batteryDisplay').innerHTML = 
-            '<div class="loading">⚠️ Connection Error</div>';
+            '<div class="loading">Connection Error</div>';
     }
 }
 
 (function init() {
-    console.log('🚀 BMS Dashboard initialized');
-    console.log('⚙️ Update interval:', CONFIG.UPDATE_INTERVAL + 'ms');
+    console.log('BMS Dashboard initialized');
+    console.log('Update interval:', CONFIG.UPDATE_INTERVAL + 'ms');
     
     ['packVolt', 'soh', 'current', 'packTemp', 'batteryDisplay', 'socPercentage', 'socCircle'].forEach(id => {
         const element = document.getElementById(id);
@@ -279,7 +276,7 @@ async function fetchBMSData() {
     fetchBMSData();
     setInterval(fetchBMSData, CONFIG.UPDATE_INTERVAL);
     
-    console.log('✅ Auto-refresh enabled');
+    console.log('Auto-refresh enabled');
 })();
 )rawliteral");
 }
