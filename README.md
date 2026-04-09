@@ -261,7 +261,7 @@ SOH = 100% - (total_cycles × 0.01%)
 
 ---
 
-##Ngưỡng bảo vệ dựa trên datasheet LiFePO4 EVH-32700
+## Ngưỡng bảo vệ dựa trên datasheet LiFePO4 EVH-32700
 
 ### Charging Protection
 | Parameter | Warning | Trip | Release | Recovery Time |
