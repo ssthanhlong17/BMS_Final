@@ -267,8 +267,8 @@ void BMSProtection::clearProtection() {
 
 void BMSProtection::printStatus() {
     Serial.println("\n╔═══ PROTECTION STATUS ═══╗");
-    Serial.printf("⚡ CHG MOSFET: %s\n", digitalRead(PIN_CHG) ? "ON" : "OFF");
-    Serial.printf("⚡ DSG MOSFET: %s\n", digitalRead(PIN_DSG) ? "ON" : "OFF");
+    Serial.printf("CHG MOSFET: %s\n", digitalRead(PIN_CHG) ? "ON" : "OFF");
+    Serial.printf("DSG MOSFET: %s\n", digitalRead(PIN_DSG) ? "ON" : "OFF");
     Serial.println("├─────────────────────────┤");
     Serial.println("│ CHARGING PROTECTION:    │");
     Serial.printf("│  OV: %s\n", chg_ov_fault ? "FAULT" : "OK");
