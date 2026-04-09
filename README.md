@@ -6,7 +6,7 @@
 
 ---
 
-## 📋 Tổng quan
+## Tổng quan
 
 Hệ thống BMS hoàn chỉnh cho pin LiFePO4 4S (14.4V nominal) với các tính năng:
 
@@ -214,7 +214,7 @@ SOH = 100% - (total_cycles × 0.01%)
 
 ---
 
-## 📊 JSON API
+## JSON API
 
 ### Endpoint: `/bms`
 
