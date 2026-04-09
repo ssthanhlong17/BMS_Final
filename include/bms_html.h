@@ -32,7 +32,7 @@ String getHTMLPage() {
         <div class="dashboard">
             <!-- HEADER -->
             <div class="header">
-                <h1>🔋 BMS Dashboard</h1>
+                <h1>BMS Dashboard</h1>
                 <div class="header-center">
                     <div class="instructor-info">GVHD: PGS TS Nguyễn Chiến Trinh</div>
                     <div class="student-group">
@@ -45,7 +45,7 @@ String getHTMLPage() {
                 </div>
                 <div class="header-right">
                     <div class="status-badge" id="chargingStatus">
-                        <span class="status-icon">⚡</span>
+                        <span class="status-icon"></span>
                         <span class="status-text">Idle</span>
                     </div>
                     <div class="live-indicator">
@@ -65,7 +65,7 @@ String getHTMLPage() {
                 <h2>📊 Trạng Thái Pack</h2>
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-icon">⚡</div>
+                        <div class="stat-icon"></div>
                         <div class="stat-info">
                             <div class="stat-label">Pack Voltage</div>
                             <div class="stat-value" id="packVolt">--</div>
@@ -87,7 +87,7 @@ String getHTMLPage() {
                     </div>
                     
                     <div class="stat-card">
-                        <div class="stat-icon">❤️</div>
+                        <div class="stat-icon"></div>
                         <div class="stat-info">
                             <div class="stat-label">State of Health</div>
                             <div class="stat-value" id="soh">--</div>
@@ -95,7 +95,7 @@ String getHTMLPage() {
                     </div>
                     
                     <div class="stat-card">
-                        <div class="stat-icon">⚡</div>
+                        <div class="stat-icon"></div>
                         <div class="stat-info">
                             <div class="stat-label">Current</div>
                             <div class="stat-value" id="current">--</div>
@@ -103,7 +103,7 @@ String getHTMLPage() {
                     </div>
 
                     <div class="stat-card">
-                        <div class="stat-icon">🌡️</div>
+                        <div class="stat-icon"></div>
                         <div class="stat-info">
                             <div class="stat-label">Pack Temperature</div>
                             <div class="stat-value" id="packTemp">--</div>
@@ -111,7 +111,7 @@ String getHTMLPage() {
                     </div>
 
                     <div class="stat-card">
-                        <div class="stat-icon">⚖️</div>
+                        <div class="stat-icon"></div>
                         <div class="stat-info">
                             <div class="stat-label">Balancing</div>
                             <div class="stat-value small" id="balancingStatus">Inactive</div>
@@ -122,10 +122,10 @@ String getHTMLPage() {
 
             <!-- PROTECTION STATUS -->
             <div class="section">
-                <h2>🛡️ Protection Status</h2>
+                <h2>Protection Status</h2>
                 <div class="protection-grid">
                     <div class="protection-item" id="protectOV">
-                        <div class="protection-icon">⚠️</div>
+                        <div class="protection-icon"></div>
                         <div class="protection-info">
                             <div class="protection-label">Over Voltage</div>
                             <div class="protection-status">Normal</div>
@@ -133,7 +133,7 @@ String getHTMLPage() {
                     </div>
 
                     <div class="protection-item" id="protectUV">
-                        <div class="protection-icon">⚠️</div>
+                        <div class="protection-icon"></div>
                         <div class="protection-info">
                             <div class="protection-label">Under Voltage</div>
                             <div class="protection-status">Normal</div>
@@ -141,7 +141,7 @@ String getHTMLPage() {
                     </div>
 
                     <div class="protection-item" id="protectOCCharge">
-                        <div class="protection-icon">⚠️</div>
+                        <div class="protection-icon"></div>
                         <div class="protection-info">
                             <div class="protection-label">Over Current</div>
                             <div class="protection-status">Normal</div>
@@ -149,7 +149,7 @@ String getHTMLPage() {
                     </div>
 
                     <div class="protection-item" id="protectOCDischarge">
-                        <div class="protection-icon">⚠️</div>
+                        <div class="protection-icon"></div>
                         <div class="protection-info">
                             <div class="protection-label">Over Current</div>
                             <div class="protection-status">Normal</div>
@@ -157,7 +157,7 @@ String getHTMLPage() {
                     </div>
 
                     <div class="protection-item" id="protectOT">
-                        <div class="protection-icon">⚠️</div>
+                        <div class="protection-icon"></div>
                         <div class="protection-info">
                             <div class="protection-label">Over Temperature</div>
                             <div class="protection-status">Normal</div>
@@ -165,7 +165,7 @@ String getHTMLPage() {
                     </div>
                     
                     <div class="protection-item" id="protectUT">
-                        <div class="protection-icon">⚠️</div>
+                        <div class="protection-icon"></div>
                         <div class="protection-info">
                             <div class="protection-label">Under Temperature</div>
                             <div class="protection-status">Normal</div>
@@ -176,7 +176,7 @@ String getHTMLPage() {
 
             <!-- BATTERY CELLS -->
             <div class="section">
-                <h2>📦 Trạng Thái Các Cell</h2>
+                <h2>Trạng Thái Các Cell</h2>
                 <div id="batteryDisplay" class="battery-grid">
                     <div class="loading">Đang tải dữ liệu...</div>
                 </div>
