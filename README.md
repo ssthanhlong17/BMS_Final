@@ -10,17 +10,17 @@
 
 Hệ thống BMS hoàn chỉnh cho pin LiFePO4 4S (14.4V nominal) với các tính năng:
 
-- ⚡ **Đo lường chính xác**: Điện áp từng cell, dòng điện, nhiệt độ
-- 🛡️ **Bảo vệ toàn diện**: Over/Under Voltage, Over Current, Over/Under Temperature
-- ⚖️ **Cân bằng cell**: Cân bằng thụ động với chu kỳ ON/OFF
-- 🔋 **Ước lượng SOC**: Thuật toán Coulomb Counting + OCV với hiệu chỉnh tự động
-- ❤️ **Ước lượng SOH**: Mô hình linear aging dựa trên số chu kỳ
-- 📺 **Màn hình DWIN**: Hiển thị thời gian thực qua UART
-- 🌐 **Web Dashboard**: Giao diện web responsive với WiFi AP
+- **Đo lường chính xác**: Điện áp từng cell, dòng điện, nhiệt độ
+- **Bảo vệ toàn diện**: Over/Under Voltage, Over Current, Over/Under Temperature
+- **Cân bằng cell**: Cân bằng thụ động với chu kỳ ON/OFF
+- **Ước lượng SOC**: Thuật toán Coulomb Counting + OCV với hiệu chỉnh tự động
+- **Ước lượng SOH**: Mô hình linear aging dựa trên số chu kỳ
+- **Màn hình DWIN**: Hiển thị thời gian thực qua UART
+- **Web Dashboard**: Giao diện web responsive với WiFi AP
 
 ---
 
-## 🔧 Phần cứng
+## Phần cứng
 
 ### Thông số pin dựa datasheet LiFePO4 EVH-32700
 - **Loại cell**: LiFePO4 EVH-32700
@@ -67,7 +67,7 @@ Baud: 115200
 
 ---
 
-## 📁 Cấu trúc dự án
+## Cấu trúc dự án
 
 ```
 ESP32_BMS/
@@ -105,7 +105,7 @@ ESP32_BMS/
 
 ---
 
-## 🚀 Cài đặt
+## Cài đặt
 
 ### Yêu cầu
 - **PlatformIO** hoặc **Arduino IDE**
@@ -128,7 +128,7 @@ ESP32_BMS/
 
 ---
 
-## 🌐 Web Dashboard
+## Web Dashboard
 
 ### Truy cập
 1. Kết nối WiFi:
@@ -139,16 +139,16 @@ ESP32_BMS/
    - URL: `http://192.168.4.1`
 
 ### Tính năng Dashboard
-- 📊 Hiển thị real-time (cập nhật 1s)
-- 🔋 SOC với circular progress bar
-- ⚡ Điện áp, dòng, nhiệt độ
-- 🛡️ Trạng thái bảo vệ
-- ⚖️ Trạng thái cân bằng
-- 🚨 Cảnh báo/Alarm
+- Hiển thị real-time (cập nhật 1s)
+- SOC với circular progress bar
+- Điện áp, dòng, nhiệt độ
+- Trạng thái bảo vệ
+- Trạng thái cân bằng
+- Cảnh báo/Alarm
 
 ---
 
-## 💻 Serial Commands
+## Serial Commands
 
 Kết nối Serial Monitor (115200 baud):
 
@@ -180,7 +180,7 @@ help            - Hiển thị menu lệnh
 
 ---
 
-## 🔬 Thuật toán
+##  Thuật toán
 
 ### SOC Estimation
 **Hybrid Method**:
@@ -261,7 +261,7 @@ SOH = 100% - (total_cycles × 0.01%)
 
 ---
 
-## 🛡️ Ngưỡng bảo vệ dựa trên datasheet LiFePO4 EVH-32700
+##Ngưỡng bảo vệ dựa trên datasheet LiFePO4 EVH-32700
 
 ### Charging Protection
 | Parameter | Warning | Trip | Release | Recovery Time |
@@ -278,17 +278,6 @@ SOH = 100% - (total_cycles × 0.01%)
 | Current   | -4.0A   | -6.0A| -3.5A   | 5s            |
 | Temp High | 55°C    | 60°C | 50°C    | 5s            |
 | Temp Low  | -5°C    | -10°C| -8°C    | 5s            |
-
----
-
-## 📈 Hiệu suất
-
-- **Update Rate**: 100ms (sensors + protection + balancing)
-- **SOC Update**: 1s
-- **SOH Update**: 10s
-- **Web Refresh**: 1s
-- **DWIN Update**: 1s
-- **Flash Save**: 5 phút
 
 ---
 
