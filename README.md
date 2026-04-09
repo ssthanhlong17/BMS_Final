@@ -83,18 +83,18 @@ ESP32_BMS/
 │   ├── [LONG] Algorithms & Monitoring
 │   ├── SOCEstimator.cpp          # Thuật toán SOC
 │   ├── SOHEstimator.cpp          # Thuật toán SOH
-│   ├── BMSData.cpp               # Cấu trúc dữ liệu & JSON
-│   └── BMSHTML.cpp               # Web Dashboard & WiFi AP
+│   └── BMSData.cpp               # Cấu trúc dữ liệu & JSON
+│    
 │
 ├── include/
 │   ├── bmsensors.h
 │   ├── bmsprotection.h
 │   ├── bmsalancing.h
 │   ├── bmsdwin.h
-│   ├── bms_html.h
-│   ├── bms_html_styles.h [LONG]
-│   ├── bms_html_scripts.h [LONG]
-│   ├── SOCEstimator.h [LONG]
+│   ├── bms_html.h                # Giao diện giám sát từ xa [LONG}      
+│   ├── bms_html_styles.h 
+│   ├── bms_html_scripts.h 
+│   ├── SOCEstimator.h 
 │   ├── SOHEstimator.h
 │   ├── BMSData.h
 │   └── BMSHTML.h
