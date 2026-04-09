@@ -150,3 +150,119 @@ void updateSOH() {
     bmsData.remainingCapacity = soh.getCurrentCapacity();
     bmsData.remainingCycles = soh.getRemainingCycles();
 }
+
+// ==================== JSON API ====================
+String getBMSJson() {
+    StaticJsonDocument<2048> doc;
+   
+    // ============ MEASUREMENT ============
+    JsonObject measurement = doc.createNestedObject("measurement");
+   
+    JsonArray cells = measurement.createNestedArray("cellVoltages");
+    for (int i = 0; i < NUM_CELLS; i++) {
+        JsonObject cell = cells.createNestedObject();
+        cell["cell"] = i + 1;
+        cell["voltage"] = String(bmsData.cellVoltages[i], 3);
+    }
+   
+    measurement["packVoltage"] = String(bmsData.packVoltage, 2);
+    measurement["avgCellVoltage"] = String(bmsData.avgCellVoltage, 3);
+    measurement["current"] = String(bmsData.current, 2);
+    measurement["packTemperature"] = String(bmsData.packTemp, 1);
+   
+    // ============ CALCULATION ============
+    JsonObject calculation = doc.createNestedObject("calculation");
+    calculation["soc"] = String(bmsData.soc, 1);
+    calculation["soh"] = String(bmsData.soh, 1);
+    calculation["remainingCapacity"] = String(bmsData.remainingCapacity, 3);
+    calculation["totalCycles"] = String(bmsData.totalCycles, 1);
+   
+    // ============ STATUS ============
+    JsonObject status = doc.createNestedObject("status");
+   
+    if (bmsData.isCharging) {
+        status["charging"] = "charging";
+    } else if (bmsData.isDischarging) {
+        status["charging"] = "discharging";
+    } else {
+        status["charging"] = "idle";
+    }
+   
+    JsonObject balancing = status.createNestedObject("balancing");
+    balancing["active"] = bmsData.balancingActive;
+   
+    JsonArray balancingCellsArray = balancing.createNestedArray("cells");
+    if (bmsData.balancingActive) {
+        for (int i = 0; i < NUM_CELLS; i++) {
+            if (bmsData.balancingCells[i]) {
+                balancingCellsArray.add(i + 1);
+            }
+        }
+    }
+   
+    // ============ PROTECTION ============
+    JsonObject protectionObj = doc.createNestedObject("protection");
+    protectionObj["overVoltage"] = bmsData.overVoltageAlarm ? "alarm" : "normal";
+    protectionObj["underVoltage"] = bmsData.underVoltageAlarm ? "alarm" : "normal";
+    protectionObj["overCurrentCharge"] = bmsData.overCurrentChargeAlarm ? "alarm" : "normal";
+    protectionObj["overCurrentDischarge"] = bmsData.overCurrentDischargeAlarm ? "alarm" : "normal";
+    protectionObj["overTempCharge"] = bmsData.overTempChargeAlarm ? "alarm" : "normal";
+    protectionObj["overTempDischarge"] = bmsData.overTempDischargeAlarm ? "alarm" : "normal";
+   
+    // ============ ALERTS ============
+    JsonArray alerts = doc.createNestedArray("alerts");
+   
+    if (bmsData.overVoltageAlarm) {
+        JsonObject alert = alerts.createNestedObject();
+        alert["severity"] = "critical";
+        alert["message"] = "Ngắt sạc: Điện áp quá cao!";
+    }
+   
+    if (bmsData.underVoltageAlarm) {
+        JsonObject alert = alerts.createNestedObject();
+        alert["severity"] = "critical";
+        alert["message"] = "Ngắt xả: Điện áp quá thấp!";
+    }
+   
+    if (bmsData.overCurrentChargeAlarm) {
+        JsonObject alert = alerts.createNestedObject();
+        alert["severity"] = "critical";
+        alert["message"] = "Ngắt sạc: Quá dòng sạc!";
+    }
+   
+    if (bmsData.overCurrentDischargeAlarm) {
+        JsonObject alert = alerts.createNestedObject();
+        alert["severity"] = "critical";
+        alert["message"] = "Ngắt xả: Quá dòng xả!";
+    }
+   
+    if (bmsData.overVoltageWarning && !bmsData.overVoltageAlarm) {
+        JsonObject alert = alerts.createNestedObject();
+        alert["severity"] = "warning";
+        alert["message"] = "Điện áp cell đang cao";
+    }
+   
+    if (bmsData.underVoltageWarning && !bmsData.underVoltageAlarm) {
+        JsonObject alert = alerts.createNestedObject();
+        alert["severity"] = "warning";
+        alert["message"] = "Điện áp cell đang thấp";
+    }
+   
+    if (bmsData.balancingActive) {
+        float maxV = bmsData.cellVoltages[0];
+        float minV = bmsData.cellVoltages[0];
+        for (int i = 1; i < NUM_CELLS; i++) {
+            if (bmsData.cellVoltages[i] > maxV) maxV = bmsData.cellVoltages[i];
+            if (bmsData.cellVoltages[i] < minV) minV = bmsData.cellVoltages[i];
+        }
+       
+        JsonObject alert = alerts.createNestedObject();
+        alert["severity"] = "info";
+        alert["message"] = String("Đang cân bằng Cell ") + String(bmsData.balancingCell) +
+                          " (Δ" + String(maxV - minV, 3) + "V)";
+    }
+   
+    String output;
+    serializeJson(doc, output);
+    return output;
+}
